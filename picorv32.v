@@ -27,7 +27,7 @@
 // `define DEBUGNETS
 // `define DEBUGREGS
 // `define DEBUGASM
-// `define DEBUG
+ `define DEBUG
 
 `ifdef DEBUG
   `define debug(debug_command) debug_command
@@ -699,7 +699,7 @@ module picorv32 #(
 	`FORMAL_KEEP reg dbg_rs2val_valid;
 
 	always @* begin
-		new_ascii_instr = "";
+//		new_ascii_instr = "";
 
 		if (instr_lui)      new_ascii_instr = "lui";
 		if (instr_auipc)    new_ascii_instr = "auipc";
@@ -1335,7 +1335,11 @@ module picorv32 #(
 
 `ifndef PICORV32_REGS
 	always @(posedge clk) begin
-		if (resetn && cpuregs_write && latched_rd)
+		if (!resetn) begin
+			for (i = 0; i < regfile_size; i = i+1)
+				cpuregs[i] <= 0;
+		end
+		 else if (resetn && cpuregs_write && latched_rd)
 `ifdef PICORV32_TESTBUG_001
 			cpuregs[latched_rd ^ 1] <= cpuregs_wrdata;
 `elsif PICORV32_TESTBUG_002
